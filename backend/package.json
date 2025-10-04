@@ -22,7 +22,8 @@
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
-    "@types/nodemailer": "^7.0.2",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

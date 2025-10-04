@@ -54,4 +54,17 @@ export const expenseApi = {
   async rejectExpense(id: string, comment: string): Promise<ApiResponse<Expense>> {
     return apiClient.post(`/expenses/${id}/reject`, { comment });
   },
+
+  // Manager approval APIs
+  async getApprovalRequests(): Promise<ApiResponse<any>> {
+    return apiClient.get('/expenses/approval-requests');
+  },
+
+  async approveExpenseRequest(expenseId: string): Promise<ApiResponse<Expense>> {
+    return apiClient.put(`/expenses/${expenseId}/approve`);
+  },
+
+  async rejectExpenseRequest(expenseId: string, rejectionReason: string): Promise<ApiResponse<Expense>> {
+    return apiClient.put(`/expenses/${expenseId}/reject`, { rejectionReason });
+  },
 };

@@ -408,4 +408,286 @@ export class ExpenseController {
       });
     }
   }
+
+  // Manager approval methods
+  static async getApprovalRequests(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+        return;
+      }
+
+      if (req.user.role !== 'manager') {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Manager role required.'
+        });
+        return;
+      }
+
+      // Get all users who report to this manager
+      const { User } = await import('../models/user.model');
+      const reportingEmployees = await User.find({
+        managerId: req.user.userId,
+        companyId: req.user.companyId,
+        isActive: true
+      }).select('_id name email');
+
+      const employeeIds = reportingEmployees.map(emp => emp._id);
+
+      if (employeeIds.length === 0) {
+        res.json({
+          success: true,
+          data: {
+            pending: [],
+            approved: [],
+            rejected: []
+          }
+        });
+        return;
+      }
+
+      // Get expenses that need approval from this manager
+      const [pendingExpenses, approvedExpenses, rejectedExpenses] = await Promise.all([
+        // Pending expenses (submitted status)
+        Expense.find({
+          userId: { $in: employeeIds },
+          status: ExpenseStatus.SUBMITTED,
+          companyId: req.user.companyId
+        }).sort({ submittedAt: -1 }),
+
+        // Recently approved expenses
+        Expense.find({
+          userId: { $in: employeeIds },
+          status: ExpenseStatus.APPROVED,
+          companyId: req.user.companyId
+        }).sort({ approvedAt: -1 }).limit(10),
+
+        // Recently rejected expenses
+        Expense.find({
+          userId: { $in: employeeIds },
+          status: ExpenseStatus.REJECTED,
+          companyId: req.user.companyId
+        }).sort({ rejectedAt: -1 }).limit(10)
+      ]);
+
+      // Populate user and category information
+      const populateExpenses = async (expenses: any[]) => {
+        const populatedExpenses = [];
+        for (const expense of expenses) {
+          const employee = reportingEmployees.find(emp => emp._id.toString() === expense.userId.toString());
+          const category = await Category.findById(expense.categoryId);
+          
+          populatedExpenses.push({
+            ...expense.toObject(),
+            employeeName: employee?.name || 'Unknown',
+            employeeEmail: employee?.email || 'Unknown',
+            category: category?.name || 'Unknown'
+          });
+        }
+        return populatedExpenses;
+      };
+
+      const [pending, approved, rejected] = await Promise.all([
+        populateExpenses(pendingExpenses),
+        populateExpenses(approvedExpenses),
+        populateExpenses(rejectedExpenses)
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          pending,
+          approved,
+          rejected
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fetch approval requests'
+      });
+    }
+  }
+
+  static async approveExpense(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+        return;
+      }
+
+      if (req.user.role !== 'manager') {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Manager role required.'
+        });
+        return;
+      }
+
+      const { expenseId } = req.params;
+      
+      // Find the expense
+      const expense = await Expense.findById(expenseId);
+      if (!expense) {
+        res.status(404).json({
+          success: false,
+          message: 'Expense not found'
+        });
+        return;
+      }
+
+      // Check if the expense belongs to an employee under this manager
+      const { User } = await import('../models/user.model');
+      const employee = await User.findOne({
+        _id: expense.userId,
+        managerId: req.user.userId,
+        companyId: req.user.companyId,
+        isActive: true
+      });
+
+      if (!employee) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only approve expenses from your direct reports.'
+        });
+        return;
+      }
+
+      // Check if expense is in submitted status
+      if (expense.status !== ExpenseStatus.SUBMITTED) {
+        res.status(400).json({
+          success: false,
+          message: 'Expense is not in submitted status'
+        });
+        return;
+      }
+
+      // Update expense status
+      expense.status = ExpenseStatus.APPROVED;
+      expense.approvedAt = new Date();
+      await expense.save();
+
+      // Create approval log
+      const approvalLog = new ExpenseApprovalLog({
+        expenseId: expense._id,
+        approverId: req.user.userId,
+        status: ApprovalStatus.APPROVED,
+        comments: 'Approved by manager',
+        actionDate: new Date()
+      });
+      await approvalLog.save();
+
+      res.json({
+        success: true,
+        message: 'Expense approved successfully',
+        data: expense
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to approve expense'
+      });
+    }
+  }
+
+  static async rejectExpense(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+        return;
+      }
+
+      if (req.user.role !== 'manager') {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Manager role required.'
+        });
+        return;
+      }
+
+      const { expenseId } = req.params;
+      const { rejectionReason } = req.body;
+
+      if (!rejectionReason || rejectionReason.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Rejection reason is required'
+        });
+        return;
+      }
+      
+      // Find the expense
+      const expense = await Expense.findById(expenseId);
+      if (!expense) {
+        res.status(404).json({
+          success: false,
+          message: 'Expense not found'
+        });
+        return;
+      }
+
+      // Check if the expense belongs to an employee under this manager
+      const { User } = await import('../models/user.model');
+      const employee = await User.findOne({
+        _id: expense.userId,
+        managerId: req.user.userId,
+        companyId: req.user.companyId,
+        isActive: true
+      });
+
+      if (!employee) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only reject expenses from your direct reports.'
+        });
+        return;
+      }
+
+      // Check if expense is in submitted status
+      if (expense.status !== ExpenseStatus.SUBMITTED) {
+        res.status(400).json({
+          success: false,
+          message: 'Expense is not in submitted status'
+        });
+        return;
+      }
+
+      // Update expense status
+      expense.status = ExpenseStatus.REJECTED;
+      expense.rejectedAt = new Date();
+      expense.rejectionReason = rejectionReason;
+      await expense.save();
+
+      // Create approval log
+      const approvalLog = new ExpenseApprovalLog({
+        expenseId: expense._id,
+        approverId: req.user.userId,
+        status: ApprovalStatus.REJECTED,
+        comments: rejectionReason,
+        actionDate: new Date()
+      });
+      await approvalLog.save();
+
+      res.json({
+        success: true,
+        message: 'Expense rejected successfully',
+        data: expense
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to reject expense'
+      });
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import { useAuth } from '../../context/AuthContext';
 import { AdminDashboard } from './AdminDashboard';
+import { ManagerDashboard } from './ManagerDashboard';
 import { EmployeeDashboard } from './EmployeeDashboard';
 
 export function DashboardRouter() {
@@ -18,8 +19,7 @@ export function DashboardRouter() {
     case 'admin':
       return <AdminDashboard />;
     case 'manager':
-      // For now, managers use the admin dashboard, but you can create a separate ManagerDashboard later
-      return <AdminDashboard />;
+      return <ManagerDashboard />;
     case 'employee':
       return <EmployeeDashboard />;
     default:

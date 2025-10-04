@@ -19,6 +19,11 @@ router.post('/:id/receipts', ExpenseController.uploadReceipt);
 // Get expenses (with filtering)
 router.get('/', ExpenseController.getExpenses);
 
+// Manager approval endpoints (must be before /:id route)
+router.get('/approval-requests', ExpenseController.getApprovalRequests);
+router.put('/:expenseId/approve', ExpenseController.approveExpense);
+router.put('/:expenseId/reject', ExpenseController.rejectExpense);
+
 // Get expense by ID
 router.get('/:id', ExpenseController.getExpenseById);
 
