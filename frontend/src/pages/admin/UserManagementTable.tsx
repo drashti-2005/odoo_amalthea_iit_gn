@@ -134,6 +134,13 @@ export function UserManagementTable() {
 
     setIsSubmitting(true);
     try {
+      console.log('Creating user with data:', {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        managerId: formData.role === 'employee' ? formData.managerId : undefined,
+      });
+      
       await userService.createUser({
         name: formData.name,
         email: formData.email,
@@ -146,6 +153,7 @@ export function UserManagementTable() {
       resetForm();
       fetchUsers();
     } catch (error: any) {
+      console.error('User creation error:', error);
       showError(error.message || 'Failed to create user');
     } finally {
       setIsSubmitting(false);
@@ -451,6 +459,7 @@ export function UserManagementTable() {
           resetForm();
         }}
         title="Create New User"
+        size="lg"
       >
         <div className="space-y-4">
           <div>
@@ -463,6 +472,9 @@ export function UserManagementTable() {
               placeholder="Enter full name"
               error={formErrors.name}
             />
+            {formErrors.name && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
+            )}
           </div>
 
           <div>
@@ -473,9 +485,12 @@ export function UserManagementTable() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Enter email address"
+              placeholder="Enter unique email address"
               error={formErrors.email}
             />
+            {formErrors.email && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -500,15 +515,21 @@ export function UserManagementTable() {
               </label>
               <select
                 value={formData.managerId}
-                onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
+                onChange={(e) => {
+                  console.log('Manager selection changed:', e.target.value);
+                  setFormData({ ...formData, managerId: e.target.value });
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Select a manager</option>
-                {managers.map((manager) => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.name} - {manager.role}
-                  </option>
-                ))}
+                {managers.map((manager) => {
+                  console.log('Manager in dropdown:', manager);
+                  return (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.name} - {manager.role}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           )}
@@ -517,8 +538,13 @@ export function UserManagementTable() {
             <div className="flex items-start">
               <span className="text-blue-500 mr-2">ℹ️</span>
               <div className="text-sm text-blue-700">
-                <p className="font-medium mb-1">Password Information</p>
-                <p>A secure temporary password will be automatically generated and sent to the user's email address. The user will be required to change it on first login.</p>
+                <p className="font-medium mb-1">User Creation Information</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>A secure temporary password will be automatically generated and sent to the user's email address</li>
+                  <li>The user will be required to change it on first login</li>
+                  <li>Email addresses must be unique - each user needs a different email</li>
+                  <li>For testing, you can use emails like: user1@company.com, user2@company.com, etc.</li>
+                </ul>
               </div>
             </div>
           </div>

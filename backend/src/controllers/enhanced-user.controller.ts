@@ -8,10 +8,14 @@ import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 export class UserController {
   static async createUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
+      console.log('CreateUser request body:', req.body);
+      console.log('CreateUser request user:', req.user);
+      
       const { email, name, role, managerId } = req.body;
 
       // Validate required fields
       if (!email || !name || !role) {
+        console.log('Missing required fields:', { email: !!email, name: !!name, role: !!role });
         res.status(400).json({
           success: false,
           message: 'Email, name, and role are required'
@@ -61,8 +65,8 @@ export class UserController {
         return;
       }
 
-      // Validate manager if provided
-      if (managerId && role === UserRole.EMPLOYEE) {
+      // Validate manager if provided (skip validation for mock company in development)
+      if (managerId && role === UserRole.EMPLOYEE && req.user.companyId !== 'mock-company-id') {
         const manager = await User.findOne({
           _id: managerId,
           companyId: req.user.companyId,
@@ -115,9 +119,21 @@ export class UserController {
         data: { user: userResponse }
       });
     } catch (error) {
+      console.error('CreateUser error:', error);
+      
+      // Handle specific MongoDB errors
+      if (error instanceof Error && error.message.includes('E11000') && error.message.includes('email')) {
+        res.status(400).json({
+          success: false,
+          message: 'A user with this email already exists'
+        });
+        return;
+      }
+      
       res.status(400).json({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to create user'
+        message: error instanceof Error ? error.message : 'Failed to create user',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
       });
     }
   }

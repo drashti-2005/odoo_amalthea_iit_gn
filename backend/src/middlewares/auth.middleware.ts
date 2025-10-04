@@ -28,6 +28,18 @@ export const authenticateToken = async (
       return;
     }
 
+    // Handle mock token in development
+    if (process.env.NODE_ENV === 'development' && token === 'mock-jwt-token') {
+      req.user = {
+        userId: 'mock-admin-id',
+        companyId: 'mock-company-id',
+        email: 'admin@example.com',
+        role: UserRole.ADMIN
+      };
+      next();
+      return;
+    }
+
     // Verify token
     const decoded: JWTPayload = verifyToken(token);
 

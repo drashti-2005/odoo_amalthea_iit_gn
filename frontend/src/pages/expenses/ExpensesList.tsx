@@ -5,7 +5,6 @@ import { useExpenses } from '../../hooks/useExpenses';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
-
 export function ExpensesList() {
   const { user } = useAuth();
   const { expenses, isLoading, error, fetchExpenses } = useExpenses();

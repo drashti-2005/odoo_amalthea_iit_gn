@@ -13,10 +13,10 @@ interface DashboardStats {
 }
 
 interface AdminOverviewProps {
-  onNavigateToUsers: () => void;
+  onNavigateToUsers?: () => void;
 }
 
-export function AdminOverview({ onNavigateToUsers }: AdminOverviewProps) {
+export function AdminOverview({ onNavigateToUsers }: AdminOverviewProps = {}) {
   const [stats, setStats] = useState<DashboardStats>({
     totalExpenses: 0,
     pendingApprovals: 0,
@@ -147,6 +147,7 @@ export function AdminOverview({ onNavigateToUsers }: AdminOverviewProps) {
                   className="w-full justify-start" 
                   variant="outline"
                   onClick={onNavigateToUsers}
+                  disabled={!onNavigateToUsers}
                 >
                   <span className="mr-3">👥</span>
                   Manage Users

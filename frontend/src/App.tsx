@@ -7,6 +7,7 @@ import { SignupPage } from './pages/auth/SignupPage';
 import { AdminDashboard } from './pages/dashboard/AdminDashboard';
 import { ExpensesList } from './pages/expenses/ExpensesList';
 import { NewExpensePage } from './pages/expenses/NewExpensePage';
+import { UsersPage } from './pages/admin/UsersPage';
 import './App.css'
 
 // Protected Route Component
@@ -125,10 +126,7 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold">User Management</h1>
-                <p className="text-gray-600 mt-2">Manage users and roles</p>
-              </div>
+              <UsersPage />
             </DashboardLayout>
           </ProtectedRoute>
         }

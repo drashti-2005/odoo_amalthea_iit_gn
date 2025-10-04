@@ -94,9 +94,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.warn('Backend not available, using mock login');
           const mockUser: User = {
             id: 'user1',
-            name: 'John Doe',
-            email: 'john@example.com',
-            role: 'employee',
+            name: 'Admin User',
+            email: 'admin@example.com',
+            role: 'admin',
             isActive: true,
             company: {
               id: 'company1',

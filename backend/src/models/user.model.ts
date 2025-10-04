@@ -77,8 +77,11 @@ userSchema.virtual('fullName').get(function(this: IUser) {
 // Transform output
 userSchema.set('toJSON', {
   transform: function(doc, ret) {
-    const { password, ...userWithoutPassword } = ret;
-    return userWithoutPassword;
+    const { password, _id, ...userWithoutPassword } = ret;
+    return {
+      id: _id,
+      ...userWithoutPassword
+    };
   }
 });
 
