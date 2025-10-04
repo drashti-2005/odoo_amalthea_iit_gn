@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { User, IUser, UserRole } from '../models/user.model';
 import { Company, ICompany } from '../models/company.model';
 import { signToken, generateResetToken } from '../utils/jwt';
@@ -178,5 +179,44 @@ export class AuthService {
     }
     
     return user;
+  }
+
+  static async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    try {
+      console.log('Reset Password Request - Token:', token);
+      
+      // Verify the token
+      const secret = process.env.JWT_SECRET || 'your-secret-key';
+      const payload = jwt.verify(token, secret) as { userId: string; type: string };
+      console.log('Token Payload:', payload);
+      
+      // Ensure it's a password reset token
+      if (payload.type !== 'password-reset') {
+        console.log('Invalid token type:', payload.type);
+        throw new Error('Invalid token type');
+      }
+      
+      const userId = payload.userId;
+      
+      // Find the user
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      // Hash the new password
+      const hashedPassword = await this.hashPassword(newPassword);
+      
+      // Update the user's password and remove password change required flag
+      await User.findByIdAndUpdate(userId, {
+        password: hashedPassword,
+        passwordChangeRequired: false
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Password reset error:', error);
+      throw new Error('Invalid or expired token');
+    }
   }
 }

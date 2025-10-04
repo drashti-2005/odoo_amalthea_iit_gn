@@ -32,6 +32,7 @@ export const authApi = {
   },
 
   async resetPassword(token: string, password: string): Promise<ApiResponse<null>> {
+    console.log('Calling reset password API with token:', token.substring(0, 10) + '...');
     return apiClient.post('/auth/reset-password', { token, password });
   },
 };

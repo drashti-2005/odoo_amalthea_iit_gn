@@ -16,6 +16,8 @@ const ResetPasswordPage: React.FC = () => {
 
   // Get token from URL
   const token = window.location.pathname.split('/reset-password/')[1];
+  console.log('Reset password page loaded with path:', window.location.pathname);
+  console.log('Extracted token:', token);
 
   const validateForm = () => {
     const newErrors: { password?: string; confirmPassword?: string } = {};
@@ -52,7 +54,15 @@ const ResetPasswordPage: React.FC = () => {
     }
     
     try {
+      console.log('Submitting password reset form with token:', token);
       setLoading(true);
+      
+      if (!token) {
+        toast.error('Invalid password reset link. Please request a new one.');
+        navigate('/login');
+        return;
+      }
+      
       const response = await authApi.resetPassword(token, password);
       
       if (response.success) {

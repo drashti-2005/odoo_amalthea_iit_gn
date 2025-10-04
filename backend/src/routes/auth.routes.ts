@@ -9,5 +9,7 @@ router.post('/login', AuthController.login);
 
 // Password reset
 router.post('/users/:id/send-password', AuthController.sendPassword);
+router.post('/reset-password', AuthController.resetPassword);
+router.post('/forgot-password', AuthController.forgotPassword);
 
 export default router;

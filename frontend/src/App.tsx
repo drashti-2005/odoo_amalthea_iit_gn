@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { DashboardRouter } from './pages/dashboard/DashboardRouter';
 import { ExpensesList } from './pages/expenses/ExpensesList';
 import { UploadReceiptPage } from './pages/expenses/UploadReceiptPage';
@@ -67,6 +68,14 @@ function AppContent() {
         element={
           <PublicRoute>
             <SignupPage />
+          </PublicRoute>
+        } 
+      />
+      <Route 
+        path="/forgot-password" 
+        element={
+          <PublicRoute>
+            <ForgotPasswordPage />
           </PublicRoute>
         } 
       />

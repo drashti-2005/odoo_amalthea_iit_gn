@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService, SignupData, LoginData } from '../services/auth.service';
-import { UserRole } from '../models/user.model';
+import { UserRole, User } from '../models/user.model';
+import { EmailService } from '../services/email.service';
 
 export class AuthController {
   static async signup(req: Request, res: Response): Promise<void> {
@@ -102,22 +103,128 @@ export class AuthController {
       }
 
       const resetToken = await AuthService.generatePasswordResetToken(id);
+      
+      // Get user information for the email
+      const user = await AuthService.getUserById(id);
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+        return;
+      }
 
-      // In a real application, you would send this token via email
-      // For now, we'll just return it in the response
-      res.status(200).json({
-        success: true,
-        message: 'Password reset token generated',
-        data: {
+      try {
+        // Send password reset link via email
+        await EmailService.sendPasswordResetLinkEmail(
+          user.email,
           resetToken,
-          // In production, this would be sent via email
-          resetLink: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
-        }
-      });
+          user.name
+        );
+
+        res.status(200).json({
+          success: true,
+          message: 'Password reset instructions sent to user email',
+          data: {
+            resetLink: `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send password reset email:', emailError);
+        res.status(500).json({
+          success: false,
+          message: 'Failed to send password reset email'
+        });
+      }
     } catch (error) {
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to generate password reset token'
+      });
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('Reset Password API Call - Body:', req.body);
+      const { token, password } = req.body;
+
+      if (!token || !password) {
+        console.log('Missing token or password in request');
+        res.status(400).json({
+          success: false,
+          message: 'Token and password are required'
+        });
+        return;
+      }
+
+      console.log('Attempting to reset password with token:', token.substring(0, 10) + '...');
+      // Verify token and update password
+      const result = await AuthService.resetPassword(token, password);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password has been reset successfully'
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to reset password'
+      });
+    }
+  }
+
+  static async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          message: 'Email is required'
+        });
+        return;
+      }
+
+      // Find the user by email
+      const user = await User.findOne({ email: email.toLowerCase(), isActive: true });
+      
+      // Don't reveal if user exists or not for security reasons
+      if (!user) {
+        res.status(200).json({
+          success: true,
+          message: 'If your email is registered, you will receive password reset instructions'
+        });
+        return;
+      }
+
+      // Generate reset token
+      const resetToken = await AuthService.generatePasswordResetToken(user._id);
+
+      try {
+        // Send password reset link via email
+        await EmailService.sendPasswordResetLinkEmail(
+          user.email,
+          resetToken,
+          user.name
+        );
+
+        res.status(200).json({
+          success: true,
+          message: 'Password reset instructions sent to your email'
+        });
+      } catch (emailError) {
+        console.error('Failed to send password reset email:', emailError);
+        res.status(500).json({
+          success: false,
+          message: 'Failed to send password reset email'
+        });
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'An error occurred while processing your request'
       });
     }
   }
