@@ -3,12 +3,20 @@ export interface User {
   name: string;
   email: string;
   role: 'admin' | 'manager' | 'employee';
+  managerId?: string;
+  manager?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
   company: {
     id: string;
     name: string;
     baseCurrency: string;
     country: string;
   };
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -98,11 +106,28 @@ export interface SignupData {
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
-  message?: string;
+  message: string;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  data: {
+    users?: T[];
+    managers?: T[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalUsers?: number;
+      limit: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+  };
+  message: string;
 }
 
 export interface ApiError {
   message: string;
-  status: number;
-  errors?: Record<string, string[]>;
+  status?: number;
+  code?: string;
 }

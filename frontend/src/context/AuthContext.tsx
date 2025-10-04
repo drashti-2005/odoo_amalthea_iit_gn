@@ -93,18 +93,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // Mock login for development when backend is not available
           console.warn('Backend not available, using mock login');
           const mockUser: User = {
-            id: '1',
-            name: 'Demo User',
-            email: credentials.email,
+            id: 'user1',
+            name: 'John Doe',
+            email: 'john@example.com',
             role: 'employee',
+            isActive: true,
             company: {
-              id: '1',
-              name: 'Demo Company',
+              id: 'company1',
+              name: 'Test Company',
               baseCurrency: 'USD',
-              country: 'US'
+              country: 'US',
             },
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           };
           const mockToken = 'mock-jwt-token';
           localStorage.setItem('token', mockToken);
@@ -155,6 +156,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             name: data.name,
             email: data.email,
             role: 'employee',
+            isActive: true,
             company: {
               id: '1',
               name: data.name,

@@ -55,7 +55,6 @@ class ApiClient {
       return {
         message: error.response.data?.message || defaultError.message,
         status: error.response.status,
-        errors: error.response.data?.errors,
       };
     }
 

@@ -39,6 +39,7 @@ export const mockExpenses: Expense[] = [
       name: 'Demo User',
       email: 'demo@example.com',
       role: 'employee',
+      isActive: true,
       company: {
         id: '1',
         name: 'Demo Company',
@@ -76,6 +77,7 @@ export const mockExpenses: Expense[] = [
       name: 'Demo User',
       email: 'demo@example.com',
       role: 'employee',
+      isActive: true,
       company: {
         id: '1',
         name: 'Demo Company',
@@ -123,6 +125,7 @@ export const mockExpenses: Expense[] = [
       name: 'Demo User',
       email: 'demo@example.com',
       role: 'employee',
+      isActive: true,
       company: {
         id: '1',
         name: 'Demo Company',
