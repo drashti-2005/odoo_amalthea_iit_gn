@@ -92,21 +92,77 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } catch (error) {
           // Mock login for development when backend is not available
           console.warn('Backend not available, using mock login');
-          const mockUser: User = {
-            id: 'user1',
-            name: 'Admin User',
-            email: 'admin@example.com',
-            role: 'admin',
-            isActive: true,
-            company: {
-              id: 'company1',
-              name: 'Test Company',
-              baseCurrency: 'USD',
-              country: 'US',
-            },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
+          
+          // Create different mock users based on email for testing
+          let mockUser: User;
+          
+          if (credentials.email === 'user1@gmail.com') {
+            mockUser = {
+              id: 'employee1',
+              name: 'Sarah Johnson',
+              email: 'user1@gmail.com',
+              role: 'employee',
+              isActive: true,
+              company: {
+                id: 'company1',
+                name: 'Tech Solutions Inc',
+                baseCurrency: 'USD',
+                country: 'US',
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          } else if (credentials.email.includes('employee')) {
+            mockUser = {
+              id: 'employee2',
+              name: 'Employee Demo',
+              email: 'employee.demo@test.com',
+              role: 'employee',
+              isActive: true,
+              company: {
+                id: 'company1',
+                name: 'Test Company',
+                baseCurrency: 'USD',
+                country: 'US',
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          } else if (credentials.email.includes('manager')) {
+            mockUser = {
+              id: 'manager1',
+              name: 'Manager Demo',
+              email: 'manager@test.com',
+              role: 'manager',
+              isActive: true,
+              company: {
+                id: 'company1',
+                name: 'Test Company',
+                baseCurrency: 'USD',
+                country: 'US',
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          } else {
+            // Default admin user
+            mockUser = {
+              id: 'admin1',
+              name: 'Admin User',
+              email: 'admin@example.com',
+              role: 'admin',
+              isActive: true,
+              company: {
+                id: 'company1',
+                name: 'Test Company',
+                baseCurrency: 'USD',
+                country: 'US',
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          
           const mockToken = 'mock-jwt-token';
           localStorage.setItem('token', mockToken);
           localStorage.setItem('user', JSON.stringify(mockUser));

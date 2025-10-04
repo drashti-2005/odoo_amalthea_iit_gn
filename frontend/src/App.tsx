@@ -4,9 +4,9 @@ import { DashboardLayout } from './layouts/DashboardLayout';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
-import { AdminDashboard } from './pages/dashboard/AdminDashboard';
+import { DashboardRouter } from './pages/dashboard/DashboardRouter';
 import { ExpensesList } from './pages/expenses/ExpensesList';
-import { NewExpensePage } from './pages/expenses/NewExpensePage';
+import { UploadReceiptPage } from './pages/expenses/UploadReceiptPage';
 import { UsersPage } from './pages/admin/UsersPage';
 import './App.css'
 
@@ -76,7 +76,7 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <AdminDashboard />
+              <DashboardRouter />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -95,11 +95,22 @@ function AppContent() {
       />
 
       <Route
+        path="/expenses/upload"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <UploadReceiptPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/expenses/new"
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <NewExpensePage />
+              <DashboardRouter />
             </DashboardLayout>
           </ProtectedRoute>
         }

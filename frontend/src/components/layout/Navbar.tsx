@@ -9,8 +9,8 @@ interface NavbarProps {
 
 const navigationItems = [
   { path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['admin', 'manager', 'employee'] },
+  { path: '/expenses/upload', label: 'Upload Receipt', icon: '📄', roles: ['employee'] },
   { path: '/expenses', label: 'My Expenses', icon: '💰', roles: ['employee', 'manager'] },
-  { path: '/expenses/new', label: 'New Expense', icon: '➕', roles: ['employee', 'manager'] },
   { path: '/approvals', label: 'Approvals', icon: '✅', roles: ['manager', 'admin'] },
   { path: '/reports', label: 'Reports', icon: '📈', roles: ['admin', 'manager'] },
   { path: '/users', label: 'Users', icon: '👥', roles: ['admin'] },
