@@ -7,7 +7,7 @@ import type {
 } from '../types';
 
 export const authApi = {
-  async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
+  async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string; passwordChangeRequired?: boolean }>> {
     return apiClient.post('/auth/login', credentials);
   },
 

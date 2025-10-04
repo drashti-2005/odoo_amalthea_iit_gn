@@ -1,7 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { MobileSidebar } from '../components/layout/MobileSidebar';
+import PasswordChangeModal from '../components/forms/PasswordChangeModal';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -30,9 +33,30 @@ const pageTransition = {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const authContext = useContext(AuthContext);
+
+  // Check if the user needs to change their password
+  useEffect(() => {
+    const passwordChangeRequired = localStorage.getItem('passwordChangeRequired') === 'true';
+    const user = authContext?.user;
+    
+    if (user && (passwordChangeRequired || user.passwordChangeRequired)) {
+      setShowPasswordModal(true);
+    }
+  }, [authContext?.user]);
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <PasswordChangeModal 
+          isOpen={showPasswordModal} 
+          onClose={() => setShowPasswordModal(false)}
+          token={authContext?.token || ''} 
+        />
+      )}
+      
       {/* Desktop Navbar */}
       <Navbar onMobileMenuToggle={() => setSidebarOpen(true)} />
 

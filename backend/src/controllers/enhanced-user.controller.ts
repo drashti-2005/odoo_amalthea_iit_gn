@@ -407,8 +407,11 @@ export class UserController {
       const newPassword = PasswordUtils.generateRandomPassword();
       const hashedPassword = await AuthService.hashPassword(newPassword);
 
-      // Update user password
-      await User.findByIdAndUpdate(id, { password: hashedPassword });
+      // Update user password and require password change on next login
+      await User.findByIdAndUpdate(id, { 
+        password: hashedPassword,
+        passwordChangeRequired: true
+      });
 
       // Send password reset email
       try {

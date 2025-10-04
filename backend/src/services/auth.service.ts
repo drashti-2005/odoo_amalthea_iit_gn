@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { User, IUser, UserRole } from '../models/user.model';
 import { Company, ICompany } from '../models/company.model';
 import { signToken, generateResetToken } from '../utils/jwt';
+import { EmailService } from './email.service';
 
 export interface SignupData {
   name: string;
@@ -20,6 +21,7 @@ export interface AuthResponse {
   user: IUser;
   company: ICompany;
   token: string;
+  passwordChangeRequired?: boolean;
 }
 
 export class AuthService {
@@ -119,7 +121,8 @@ export class AuthService {
     return {
       user,
       company,
-      token
+      token,
+      passwordChangeRequired: user.passwordChangeRequired || false
     };
   }
 
@@ -150,7 +153,7 @@ export class AuthService {
     }
 
     // Generate a temporary password (should be changed on first login)
-    const temporaryPassword = Math.random().toString(36).slice(-8);
+    const temporaryPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
     const hashedPassword = await this.hashPassword(temporaryPassword);
 
     const user = new User({
@@ -160,10 +163,20 @@ export class AuthService {
       name,
       role,
       managerId,
-      isActive: true
+      isActive: true,
+      passwordChangeRequired: true // Force password change on first login
     });
 
     await user.save();
+    
+    // Send temporary password via email
+    try {
+      await EmailService.sendTemporaryPassword(email, temporaryPassword, name);
+    } catch (error) {
+      console.error('Failed to send temporary password email:', error);
+      // Don't fail the user creation if email fails, but log the error
+    }
+    
     return user;
   }
 }

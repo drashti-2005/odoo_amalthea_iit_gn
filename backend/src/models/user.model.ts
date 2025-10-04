@@ -15,6 +15,7 @@ export interface IUser extends Document {
   role: UserRole;
   managerId?: string;
   isActive: boolean;
+  passwordChangeRequired: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +59,10 @@ const userSchema = new Schema<IUser>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  passwordChangeRequired: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true,

@@ -77,7 +77,8 @@ export class AuthController {
         data: {
           user: result.user,
           company: result.company,
-          token: result.token
+          token: result.token,
+          passwordChangeRequired: result.passwordChangeRequired
         }
       });
     } catch (error) {

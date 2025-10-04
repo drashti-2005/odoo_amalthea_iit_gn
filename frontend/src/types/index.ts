@@ -17,6 +17,7 @@ export interface User {
     country: string;
   };
   isActive: boolean;
+  passwordChangeRequired?: boolean;
   createdAt: string;
   updatedAt: string;
 }

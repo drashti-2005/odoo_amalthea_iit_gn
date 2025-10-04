@@ -9,7 +9,7 @@ interface AuthContextType extends AuthState {
   checkAuth: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthAction =
   | { type: 'AUTH_START' }
@@ -171,7 +171,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         const response = await authApi.login(credentials);
         if (response.success) {
-          const { user, token } = response.data;
+          const { user, token, passwordChangeRequired } = response.data;
+          
+          // Store the password change required flag
+          if (passwordChangeRequired) {
+            localStorage.setItem('passwordChangeRequired', 'true');
+            // Add the flag to the user object for component access
+            user.passwordChangeRequired = true;
+          }
+          
           localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(user));
           dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
