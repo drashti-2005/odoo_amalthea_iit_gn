@@ -5,6 +5,8 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import { AdminDashboard } from './pages/dashboard/AdminDashboard';
+import { ExpensesList } from './pages/expenses/ExpensesList';
+import { NewExpensePage } from './pages/expenses/NewExpensePage';
 import './App.css'
 
 // Protected Route Component
@@ -85,10 +87,7 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold">My Expenses</h1>
-                <p className="text-gray-600 mt-2">Manage your expense submissions</p>
-              </div>
+              <ExpensesList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -99,10 +98,7 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold">New Expense</h1>
-                <p className="text-gray-600 mt-2">Submit a new expense for approval</p>
-              </div>
+              <NewExpensePage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -189,7 +185,12 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
+    <Router 
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <AuthProvider>
         <AppContent />
       </AuthProvider>

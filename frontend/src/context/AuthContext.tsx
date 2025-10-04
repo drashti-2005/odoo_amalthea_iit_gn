@@ -76,15 +76,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      const response = await authApi.login(credentials);
       
-      if (response.success) {
-        const { user, token } = response.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+      // For development: Mock login if backend is not available
+      if (import.meta.env.DEV) {
+        try {
+          const response = await authApi.login(credentials);
+          if (response.success) {
+            const { user, token } = response.data;
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+          } else {
+            throw new Error(response.message || 'Login failed');
+          }
+        } catch (error) {
+          // Mock login for development when backend is not available
+          console.warn('Backend not available, using mock login');
+          const mockUser: User = {
+            id: '1',
+            name: 'Demo User',
+            email: credentials.email,
+            role: 'employee',
+            company: {
+              id: '1',
+              name: 'Demo Company',
+              baseCurrency: 'USD',
+              country: 'US'
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          const mockToken = 'mock-jwt-token';
+          localStorage.setItem('token', mockToken);
+          localStorage.setItem('user', JSON.stringify(mockUser));
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user: mockUser, token: mockToken } });
+        }
       } else {
-        throw new Error(response.message || 'Login failed');
+        const response = await authApi.login(credentials);
+        if (response.success) {
+          const { user, token } = response.data;
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+        } else {
+          throw new Error(response.message || 'Login failed');
+        }
       }
     } catch (error) {
       dispatch({ type: 'AUTH_FAILURE' });
@@ -95,15 +131,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signup = async (data: SignupData) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      const response = await authApi.signup(data);
       
-      if (response.success) {
-        const { user, token } = response.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+      // For development: Mock signup if backend is not available
+      if (import.meta.env.DEV) {
+        try {
+          const response = await authApi.signup(data);
+          if (response.success) {
+            const { user, token } = response.data;
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+          } else {
+            throw new Error(response.message || 'Signup failed');
+          }
+        } catch (error) {
+          // Mock signup for development when backend is not available
+          console.warn('Backend not available, using mock signup');
+          const mockUser: User = {
+            id: '1',
+            name: data.name,
+            email: data.email,
+            role: 'employee',
+            company: {
+              id: '1',
+              name: data.name,
+              baseCurrency: data.baseCurrency || 'USD',
+              country: data.country || 'US'
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          const mockToken = 'mock-jwt-token';
+          localStorage.setItem('token', mockToken);
+          localStorage.setItem('user', JSON.stringify(mockUser));
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user: mockUser, token: mockToken } });
+        }
       } else {
-        throw new Error(response.message || 'Signup failed');
+        const response = await authApi.signup(data);
+        if (response.success) {
+          const { user, token } = response.data;
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+        } else {
+          throw new Error(response.message || 'Signup failed');
+        }
       }
     } catch (error) {
       dispatch({ type: 'AUTH_FAILURE' });
@@ -128,14 +200,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
-      // Verify token with backend
-      const response = await authApi.getMe();
-      if (response.success) {
-        const user = response.data;
-        localStorage.setItem('user', JSON.stringify(user));
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+      // For development: Skip API call if backend is not available
+      if (import.meta.env.DEV) {
+        try {
+          const response = await authApi.getMe();
+          if (response.success) {
+            const user = response.data;
+            localStorage.setItem('user', JSON.stringify(user));
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+          } else {
+            dispatch({ type: 'AUTH_FAILURE' });
+          }
+        } catch (error) {
+          // If API call fails in development, use stored user data
+          console.warn('Backend not available, using stored user data');
+          try {
+            const user = JSON.parse(userStr);
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+          } catch {
+            dispatch({ type: 'AUTH_FAILURE' });
+          }
+        }
       } else {
-        dispatch({ type: 'AUTH_FAILURE' });
+        // In production, always verify token with backend
+        const response = await authApi.getMe();
+        if (response.success) {
+          const user = response.data;
+          localStorage.setItem('user', JSON.stringify(user));
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+        } else {
+          dispatch({ type: 'AUTH_FAILURE' });
+        }
       }
     } catch (error) {
       dispatch({ type: 'AUTH_FAILURE' });

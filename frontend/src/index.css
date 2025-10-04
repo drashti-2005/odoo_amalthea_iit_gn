@@ -3,12 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    @apply scroll-smooth;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 antialiased;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
   }
 }
 
@@ -32,6 +46,26 @@
   .card-hover {
     @apply card hover:shadow-md transition-shadow duration-200;
   }
+
+  .grid-dashboard {
+    @apply grid grid-cols-1 lg:grid-cols-[280px_1fr] min-h-screen;
+  }
+
+  .grid-expense-cards {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6;
+  }
+
+  .grid-form {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+
+  .container-full {
+    @apply w-full min-h-screen;
+  }
+
+  .container-max {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
 }
 
 @layer utilities {
@@ -41,5 +75,10 @@
   
   .glass-effect {
     @apply bg-white/80 backdrop-blur-sm border border-white/20;
+  }
+
+  .full-width {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
   }
 }

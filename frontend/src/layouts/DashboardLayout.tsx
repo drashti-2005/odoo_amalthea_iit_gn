@@ -39,7 +39,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="container-full grid-dashboard">
       {/* Mobile sidebar backdrop */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -55,52 +55,74 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <motion.aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        animate={{ x: sidebarOpen ? 0 : -256 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        initial={false}
+        animate={{
+          x: sidebarOpen ? 0 : -320,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 30,
+        }}
+        className="fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 lg:translate-x-0 overflow-y-auto"
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
-            <Link to="/dashboard" className="flex items-center">
-              <h1 className="text-xl font-bold text-gradient">ExpenseFlow</h1>
-            </Link>
+          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+            <div className="text-xl font-bold text-gradient">
+              ExpenseFlow
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+            >
+              <span className="sr-only">Close sidebar</span>
+              ✕
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 px-4 py-6 space-y-2">
             {filteredNavigation.map((item) => (
-              <Link key={item.path} to={item.path}>
-                <motion.div
-                  className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-                    isActivePath(item.path)
-                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="text-xl mr-3">{item.icon}</span>
-                  <span className="font-medium">{item.label}</span>
-                </motion.div>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActivePath(item.path)
+                    ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="text-xl">{item.icon}</span>
+                {item.label}
               </Link>
             ))}
           </nav>
 
           {/* User Profile */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium">
-                {user?.name?.charAt(0).toUpperCase()}
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 font-medium">
+                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                </span>
               </div>
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {user?.role || 'role'}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full"
+            >
               Sign Out
             </Button>
           </div>
@@ -108,54 +130,29 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </motion.aside>
 
       {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="lg:hidden text-gray-500 hover:text-gray-700"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
-                
-                <div className="ml-4 lg:ml-0">
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {filteredNavigation.find(item => isActivePath(item.path))?.label || 'Dashboard'}
-                  </h1>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <div className="hidden md:block text-sm text-gray-600">
-                  {user?.company?.name}
-                </div>
-                
-                {/* Notifications */}
-                <button className="relative p-2 text-gray-500 hover:text-gray-700">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5-5V9.09c0-3.09-2.42-5.59-5.41-5.59S4.18 6 4.18 9.09V12l-5 5h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-                </button>
-              </div>
+      <div className="flex flex-col min-h-screen">
+        {/* Top Navigation Bar */}
+        <header className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+            >
+              <span className="sr-only">Open sidebar</span>
+              ☰
+            </button>
+            <div className="text-lg font-bold text-gradient">
+              ExpenseFlow
             </div>
+            <div className="w-10"></div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        <main className="flex-1 overflow-auto">
+          <div className="container-max py-6">
             {children}
-          </motion.div>
+          </div>
         </main>
       </div>
     </div>

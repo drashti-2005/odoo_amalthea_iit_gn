@@ -50,10 +50,10 @@ const itemVariants = {
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Navigation */}
-      <nav className="relative z-10 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container-max flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -78,36 +78,37 @@ export function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="relative w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+        <div className="container-max">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
+              className="order-2 lg:order-1"
             >
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Expense Management
                 <span className="text-gradient block">Made Simple</span>
               </h1>
               
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">
                 Streamline your expense reporting process with intelligent automation, 
                 role-based approvals, and real-time insights.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/signup">
-                  <Button size="lg" className="w-full sm:w-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <Link to="/signup" className="w-full">
+                  <Button size="lg" className="w-full">
                     Start Free Trial
                   </Button>
                 </Link>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full">
                   Watch Demo
                 </Button>
               </div>
               
-              <div className="mt-8 flex items-center gap-8 text-sm text-gray-600">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
                   No credit card required
@@ -123,7 +124,7 @@ export function LandingPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              className="relative order-1 lg:order-2"
             >
               <Hero3DAnimation />
             </motion.div>
@@ -132,18 +133,18 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="px-6 py-20 bg-white/50">
-        <div className="max-w-7xl mx-auto">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-16 lg:py-20 bg-white/50">
+        <div className="container-max">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Everything you need to manage expenses
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
               Powerful features designed to make expense management effortless for teams of any size
             </p>
           </motion.div>
@@ -152,7 +153,7 @@ export function LandingPage() {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid-expense-cards"
           >
             {features.map((feature, index) => (
               <motion.div key={index} variants={itemVariants}>
@@ -168,17 +169,17 @@ export function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-6 py-20">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
               Ready to streamline your expenses?
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-lg sm:text-xl text-gray-600 mb-8">
               Join thousands of companies already using ExpenseFlow
             </p>
             <Link to="/signup">
@@ -191,8 +192,8 @@ export function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center">
+      <footer className="w-full bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="container-max text-center">
           <div className="text-2xl font-bold text-gradient mb-4">ExpenseFlow</div>
           <p className="text-gray-400">© 2024 ExpenseFlow. All rights reserved.</p>
         </div>

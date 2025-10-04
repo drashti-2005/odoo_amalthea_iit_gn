@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { expenseApi } from '../api/expenses';
+import { mockExpenses, mockApiDelay } from '../utils/mockData';
 import type { Expense, Category } from '../types';
 
 export function useExpenses() {
@@ -12,11 +13,28 @@ export function useExpenses() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await expenseApi.getExpenses();
-      if (response.success) {
-        setExpenses(response.data);
+      
+      // For development: Use mock data if API is not available
+      if (import.meta.env.DEV) {
+        try {
+          const response = await expenseApi.getExpenses();
+          if (response.success) {
+            setExpenses(response.data);
+          } else {
+            setError(response.message || 'Failed to fetch expenses');
+          }
+        } catch (err: any) {
+          console.warn('API not available, using mock data');
+          await mockApiDelay(500);
+          setExpenses(mockExpenses);
+        }
       } else {
-        setError(response.message || 'Failed to fetch expenses');
+        const response = await expenseApi.getExpenses();
+        if (response.success) {
+          setExpenses(response.data);
+        } else {
+          setError(response.message || 'Failed to fetch expenses');
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Failed to fetch expenses');
@@ -27,9 +45,51 @@ export function useExpenses() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await expenseApi.getCategories();
-      if (response.success) {
-        setCategories(response.data);
+      // For development: Use mock categories if API is not available
+      if (import.meta.env.DEV) {
+        try {
+          const response = await expenseApi.getCategories();
+          if (response.success) {
+            setCategories(response.data);
+          }
+        } catch (err: any) {
+          console.warn('API not available, using mock categories');
+          const mockCategories: Category[] = [
+            {
+              id: '1',
+              name: 'Meals & Entertainment',
+              description: 'Business meals and entertainment expenses',
+              isActive: true,
+              companyId: '1',
+              createdAt: '2024-09-01T00:00:00Z',
+              updatedAt: '2024-09-01T00:00:00Z'
+            },
+            {
+              id: '2',
+              name: 'Office Supplies',
+              description: 'Office equipment and supplies',
+              isActive: true,
+              companyId: '1',
+              createdAt: '2024-09-01T00:00:00Z',
+              updatedAt: '2024-09-01T00:00:00Z'
+            },
+            {
+              id: '3',
+              name: 'Travel',
+              description: 'Business travel expenses',
+              isActive: true,
+              companyId: '1',
+              createdAt: '2024-09-01T00:00:00Z',
+              updatedAt: '2024-09-01T00:00:00Z'
+            }
+          ];
+          setCategories(mockCategories);
+        }
+      } else {
+        const response = await expenseApi.getCategories();
+        if (response.success) {
+          setCategories(response.data);
+        }
       }
     } catch (err: any) {
       console.error('Failed to fetch categories:', err);

@@ -91,9 +91,8 @@ export interface SignupData {
   name: string;
   email: string;
   password: string;
-  companyName: string;
-  baseCurrency: string;
   country: string;
+  baseCurrency: string;
 }
 
 export interface ApiResponse<T> {
