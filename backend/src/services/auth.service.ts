@@ -4,12 +4,11 @@ import { Company, ICompany } from '../models/company.model';
 import { signToken, generateResetToken } from '../utils/jwt';
 
 export interface SignupData {
-  companyName: string;
-  baseCurrency: string;
+  name: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  country: string;
+  baseCurrency: string;
 }
 
 export interface LoginData {
@@ -33,8 +32,20 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
+  static async getUserById(userId: string): Promise<IUser> {
+    const user = await User.findById(userId)
+      .populate('companyId')
+      .select('-password');
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    return user;
+  }
+
   static async signup(signupData: SignupData): Promise<AuthResponse> {
-    const { companyName, baseCurrency, email, password, firstName, lastName } = signupData;
+    const { name, baseCurrency, email, password, country } = signupData;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -44,8 +55,9 @@ export class AuthService {
 
     // Create company
     const company = new Company({
-      name: companyName,
-      baseCurrency
+      name: `${name}'s Company`, // Default company name
+      baseCurrency,
+      country
     });
     await company.save();
 
@@ -57,8 +69,7 @@ export class AuthService {
       companyId: company._id,
       email: email.toLowerCase(),
       password: hashedPassword,
-      firstName,
-      lastName,
+      name,
       role: UserRole.ADMIN,
       isActive: true
     });
@@ -125,13 +136,12 @@ export class AuthService {
     companyId: string,
     userData: {
       email: string;
-      firstName: string;
-      lastName: string;
+      name: string;
       role: UserRole;
       managerId?: string;
     }
   ): Promise<IUser> {
-    const { email, firstName, lastName, role, managerId } = userData;
+    const { email, name, role, managerId } = userData;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -147,8 +157,7 @@ export class AuthService {
       companyId,
       email: email.toLowerCase(),
       password: hashedPassword,
-      firstName,
-      lastName,
+      name,
       role,
       managerId,
       isActive: true

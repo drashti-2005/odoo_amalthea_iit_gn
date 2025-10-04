@@ -8,7 +8,7 @@ export class UserService {
       isActive: true
     })
       .select('-password')
-      .populate('managerId', 'firstName lastName email')
+      .populate('managerId', 'name email')
       .sort({ createdAt: -1 });
   }
 
@@ -19,7 +19,7 @@ export class UserService {
       isActive: true
     })
       .select('-password')
-      .populate('managerId', 'firstName lastName email');
+      .populate('managerId', 'name email');
   }
 
   static async getManagersAndAdmins(companyId: string): Promise<IUser[]> {

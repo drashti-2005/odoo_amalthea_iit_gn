@@ -52,8 +52,7 @@ describe('Authentication Service', () => {
         baseCurrency: 'USD',
         email: 'admin@test.com',
         password: 'password123',
-        firstName: 'John',
-        lastName: 'Doe'
+        name: 'John Doe',
       };
 
       const result = await AuthService.signup(signupData);
@@ -76,8 +75,7 @@ describe('Authentication Service', () => {
         baseCurrency: 'USD',
         email: 'admin@test.com',
         password: 'password123',
-        firstName: 'John',
-        lastName: 'Doe'
+        name: 'John Doe',
       };
 
       // First signup
@@ -98,8 +96,7 @@ describe('Authentication Service', () => {
         baseCurrency: 'USD',
         email: 'admin@test.com',
         password: 'password123',
-        firstName: 'John',
-        lastName: 'Doe'
+        name: 'John Doe',
       };
 
       try {

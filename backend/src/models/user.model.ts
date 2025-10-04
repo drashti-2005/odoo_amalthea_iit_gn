@@ -11,8 +11,7 @@ export interface IUser extends Document {
   companyId: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   role: UserRole;
   managerId?: string;
   isActive: boolean;
@@ -38,19 +37,12 @@ const userSchema = new Schema<IUser>({
     required: true,
     minlength: 6
   },
-  firstName: {
+  name: {
     type: String,
     required: true,
     trim: true,
     minlength: 1,
-    maxlength: 50
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 1,
-    maxlength: 50
+    maxlength: 100
   },
   role: {
     type: String,
@@ -77,9 +69,9 @@ userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ companyId: 1 });
 userSchema.index({ managerId: 1 });
 
-// Virtual for full name
+// Virtual for display name (keeping the same property name for compatibility)
 userSchema.virtual('fullName').get(function(this: IUser) {
-  return `${this.firstName} ${this.lastName}`;
+  return this.name;
 });
 
 // Transform output

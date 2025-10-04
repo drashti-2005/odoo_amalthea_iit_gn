@@ -8,8 +8,8 @@ export class AuthController {
       const signupData: SignupData = req.body;
 
       // Validate required fields
-      const { companyName, baseCurrency, email, password, firstName, lastName } = signupData;
-      if (!companyName || !baseCurrency || !email || !password || !firstName || !lastName) {
+      const { name, baseCurrency, email, password, country } = signupData;
+      if (!name || !baseCurrency || !email || !password || !country) {
         res.status(400).json({
           success: false,
           message: 'All fields are required'

@@ -6,13 +6,13 @@ import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 export class UserController {
   static async createUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const { email, firstName, lastName, role, managerId } = req.body;
+      const { email, name, role, managerId } = req.body;
 
       // Validate required fields
-      if (!email || !firstName || !lastName || !role) {
+      if (!email || !name || !role) {
         res.status(400).json({
           success: false,
-          message: 'Email, firstName, lastName, and role are required'
+          message: 'Email, name, and role are required'
         });
         return;
       }
@@ -55,8 +55,7 @@ export class UserController {
 
       const user = await AuthService.createUser(req.user.companyId, {
         email,
-        firstName,
-        lastName,
+        name,
         role,
         managerId
       });
@@ -105,7 +104,7 @@ export class UserController {
 
       const users = await User.find(filter)
         .select('-password')
-        .populate('managerId', 'firstName lastName email')
+        .populate('managerId', 'name email')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
@@ -153,7 +152,7 @@ export class UserController {
         isActive: true
       })
         .select('-password')
-        .populate('managerId', 'firstName lastName email');
+        .populate('managerId', 'name email');
 
       if (!user) {
         res.status(404).json({
@@ -188,7 +187,7 @@ export class UserController {
   static async updateUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { firstName, lastName, managerId } = req.body;
+      const { name, managerId } = req.body;
 
       if (!req.user) {
         res.status(401).json({
@@ -208,8 +207,7 @@ export class UserController {
       }
 
       const updateData: any = {};
-      if (firstName) updateData.firstName = firstName;
-      if (lastName) updateData.lastName = lastName;
+      if (name) updateData.name = name;
       if (managerId && req.user.role === UserRole.ADMIN) {
         updateData.managerId = managerId;
       }

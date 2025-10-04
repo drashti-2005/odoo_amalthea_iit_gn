@@ -4,6 +4,7 @@ export interface ICompany extends Document {
   _id: string;
   name: string;
   baseCurrency: string;
+  country: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,8 +21,12 @@ const companySchema = new Schema<ICompany>({
     type: String,
     required: true,
     uppercase: true,
-    enum: ['USD', 'EUR', 'GBP', 'INR', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY'],
     default: 'USD'
+  },
+  country: {
+    type: String,
+    required: true,
+    trim: true
   }
 }, {
   timestamps: true,

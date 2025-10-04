@@ -63,7 +63,7 @@ export class ExpenseService {
 
     const expenses = await Expense.find(filter)
       .populate('categoryId', 'name')
-      .populate('userId', 'firstName lastName email')
+      .populate('userId', 'name email')
       .populate('approvalRuleId', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -174,7 +174,7 @@ export class ExpenseService {
 
     return Expense.find(filter)
       .populate('categoryId', 'name')
-      .populate('userId', 'firstName lastName email')
+      .populate('userId', 'name email')
       .populate('approvalRuleId', 'name')
       .sort({ createdAt: -1 });
   }

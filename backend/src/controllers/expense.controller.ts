@@ -70,7 +70,7 @@ export class ExpenseController {
 
       const populatedExpense = await Expense.findById(expense._id)
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email');
+        .populate('userId', 'name email');
 
       res.status(201).json({
         success: true,
@@ -199,7 +199,7 @@ export class ExpenseController {
 
       const populatedExpense = await Expense.findById(expense._id)
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email')
+        .populate('userId', 'name email')
         .populate('approvalRuleId', 'name approvalType');
 
       res.status(200).json({
@@ -309,7 +309,7 @@ export class ExpenseController {
 
       const expenses = await Expense.find(filter)
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email')
+        .populate('userId', 'name email')
         .populate('approvalRuleId', 'name')
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -375,7 +375,7 @@ export class ExpenseController {
 
       const expense = await Expense.findOne(filter)
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email')
+        .populate('userId', 'name email')
         .populate('approvalRuleId', 'name approvalType');
 
       if (!expense) {
@@ -389,7 +389,7 @@ export class ExpenseController {
       // Get receipts and approval logs
       const receipts = await Receipt.find({ expenseId: id });
       const approvalLogs = await ExpenseApprovalLog.find({ expenseId: id })
-        .populate('approverId', 'firstName lastName email')
+        .populate('approverId', 'name email')
         .sort({ order: 1 });
 
       res.status(200).json({

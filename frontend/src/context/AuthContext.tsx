@@ -135,7 +135,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // For development: Mock signup if backend is not available
       if (import.meta.env.DEV) {
         try {
+          console.log('Attempting signup with data:', data);
           const response = await authApi.signup(data);
+          console.log('Signup response:', response);
           if (response.success) {
             const { user, token } = response.data;
             localStorage.setItem('token', token);
@@ -145,6 +147,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             throw new Error(response.message || 'Signup failed');
           }
         } catch (error) {
+          console.error('Signup API error:', error);
           // Mock signup for development when backend is not available
           console.warn('Backend not available, using mock signup');
           const mockUser: User = {

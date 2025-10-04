@@ -37,7 +37,7 @@ export class ApprovalController {
         .populate({
           path: 'expenseId',
           populate: [
-            { path: 'userId', select: 'firstName lastName email' },
+            { path: 'userId', select: 'name email' },
             { path: 'categoryId', select: 'name' }
           ]
         })
@@ -126,7 +126,7 @@ export class ApprovalController {
 
       const updatedExpense = await Expense.findById(expense._id)
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email');
+        .populate('userId', 'name email');
 
       res.status(200).json({
         success: true,
@@ -197,7 +197,7 @@ export class ApprovalController {
         { new: true }
       )
         .populate('categoryId', 'name')
-        .populate('userId', 'firstName lastName email');
+        .populate('userId', 'name email');
 
       // Update all other pending approval logs for this expense
       await ExpenseApprovalLog.updateMany(
@@ -264,7 +264,7 @@ export class ApprovalController {
       }
 
       const approvalLogs = await ExpenseApprovalLog.find({ expenseId })
-        .populate('approverId', 'firstName lastName email role')
+        .populate('approverId', 'name email role')
         .populate('approvalRuleId', 'name approvalType')
         .sort({ order: 1, createdAt: 1 });
 

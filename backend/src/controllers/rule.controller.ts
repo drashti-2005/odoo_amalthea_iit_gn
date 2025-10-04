@@ -98,7 +98,7 @@ export class RuleController {
         approvalRuleId: approvalRule._id,
         isActive: true
       })
-        .populate('userId', 'firstName lastName email role')
+        .populate('userId', 'name email role')
         .sort({ order: 1 });
 
       res.status(201).json({
@@ -151,7 +151,7 @@ export class RuleController {
             approvalRuleId: rule._id,
             isActive: true
           })
-            .populate('userId', 'firstName lastName email role')
+            .populate('userId', 'name email role')
             .sort({ order: 1 });
 
           return {
@@ -213,7 +213,7 @@ export class RuleController {
         approvalRuleId: id,
         isActive: true
       })
-        .populate('userId', 'firstName lastName email role')
+        .populate('userId', 'name email role')
         .sort({ order: 1 });
 
       res.status(200).json({
