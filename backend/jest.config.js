@@ -18,5 +18,9 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  testTimeout: 15000, // 15 seconds timeout for all tests
+  verbose: true,
+  forceExit: true, // Force Jest to exit after tests complete
+  detectOpenHandles: true, // Detect handles that prevent Jest from exiting
   testTimeout: 10000,
 };

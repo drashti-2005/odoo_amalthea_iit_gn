@@ -7,6 +7,12 @@ import dotenv from 'dotenv';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
 import healthRoutes from './routes/healthRoutes';
+import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
+import ruleRoutes from './routes/rule.routes';
+import expenseRoutes from './routes/expense.routes';
+import approvalRoutes from './routes/approval.routes';
+import categoryRoutes from './routes/category.routes';
 import { connectDatabase } from './config/database';
 import { logger } from './utils/logger';
 
@@ -25,12 +31,21 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/approval-rules', ruleRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/approvals', approvalRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
 
 // Global error handler
 app.use(errorHandler);
+
+// Export app for testing
+export { app };
 
 // Start server
 const startServer = async () => {

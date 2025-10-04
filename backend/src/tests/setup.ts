@@ -2,18 +2,15 @@
 import 'jest';
 
 // Global test setup
-beforeAll(() => {
+beforeAll(async () => {
   // Setup global test configuration
   process.env.NODE_ENV = 'test';
-  process.env.JWT_SECRET = 'test-jwt-secret';
-  process.env.MONGODB_URI = 'mongodb://localhost:27017/test_db';
-});
+  process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing';
+  
+  console.log('Test environment setup complete');
+}, 10000);
 
-// Mock console.log in tests to reduce noise
-global.console = {
-  ...console,
-  log: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-};
+// Clean up after all tests
+afterAll(async () => {
+  console.log('Test cleanup complete');
+}, 10000);
